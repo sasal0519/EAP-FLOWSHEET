@@ -16,6 +16,7 @@ Este projeto foi criado com o intuito de compreender os fundamentos por trás da
 * **Ajuste Dinâmico:** Os blocos se adaptam automaticamente ao tamanho do texto inserido.
 * **Centralização Automática:** A raiz do projeto está sempre no centro da tela.
 * **Numeração Automática:** A numeração da Estrutura Analítica de Projeto (WBS) é gerada e atualizada dinamicamente.
+
 Exemplo 1
 <img width="1433" height="828" alt="Exemplo 1" src="https://github.com/user-attachments/assets/4be347d9-d6cd-4f7e-bff6-53aa6173588f" />
 
