@@ -5,7 +5,7 @@ import tkinter.font as tkfont
 class EAPApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Gerador de EAP Visual - Interativo com Zoom")
+        self.root.title("EAP-FLOWSHEET")
         self.root.geometry("1600x900")
         
         self.root.withdraw()
