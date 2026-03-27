@@ -1,8 +1,3 @@
-Com a mudança do seu projeto para o PyQt5, o aplicativo ganhou um belo upgrade na interface (Dark Mode), controles de zoom nativos e um sistema gráfico muito mais robusto usando QGraphicsScene.
-
-Fiz a atualização do seu README.md para refletir a nova tecnologia, as novas funcionalidades (como o editor flutuante e o zoom) e as novas instruções de instalação, já que agora o PyQt5 precisa ser instalado separadamente (diferente do Tkinter).
-
-Aqui está a versão atualizada:
 
 📊 Gerador Interativo de EAP (Estrutura Analítica de Projeto)
 Um aplicativo educacional desenvolvido em Python e PyQt5 para o estudo prático de algoritmos de renderização visual e estruturas de dados em formato de árvore (Tree Data Structures).
