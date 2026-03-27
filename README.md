@@ -83,8 +83,7 @@ O projeto utiliza uma abordagem **Top-Down** para calcular as hierarquias e **Bo
   <a href="#-contribuir">Contribuir</a>
 </p>
 
-![Screenshot da Aplicação](https://via.placeholder.com/1000x500.png?text=Coloque+Aqui+Uma+Captura+de+Ecr%C3%A3+do+Seu+Software)
-*Dica: Substitui o link acima por uma captura de ecrã (screenshot) real da tua aplicação a funcionar!*
+<img width="1920" height="1080" alt="2026-03-27_12-22-12" src="https://github.com/user-attachments/assets/c3235a82-b268-4b38-bfde-112e261bc80f" />
 
 ---
 
