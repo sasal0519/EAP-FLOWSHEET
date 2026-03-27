@@ -20,7 +20,8 @@ Este projeto foi criado com o intuito de compreender os fundamentos por trás da
 Exemplo 1
 <img width="1433" height="828" alt="Exemplo 1" src="https://github.com/user-attachments/assets/4be347d9-d6cd-4f7e-bff6-53aa6173588f" />
 Versão 2
-<img width="1920" height="1034" alt="print" src="https://github.com/user-attachments/assets/0df2162a-509b-45dc-a5a5-d0d6c462ca84" />
+<img width="1917" height="1040" alt="image" src="https://github.com/user-attachments/assets/77c13fb1-2eaa-4a51-857a-76f1efeefcea" />
+
 
 ## 🛠️ Como a Estrutura do Fluxograma Funciona?
 
