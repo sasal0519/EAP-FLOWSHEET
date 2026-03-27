@@ -20,7 +20,7 @@ Este projeto foi criado com o intuito de compreender os fundamentos por trás da
 Exemplo 1
 <img width="1433" height="828" alt="Exemplo 1" src="https://github.com/user-attachments/assets/4be347d9-d6cd-4f7e-bff6-53aa6173588f" />
 Versão 2
-<img width="1903" height="1041" alt="image" src="https://github.com/user-attachments/assets/7be7a51a-83d4-4f1d-8209-b189a5e89587" />
+<img width="1920" height="1042" alt="2026-03-27_08-50-45" src="https://github.com/user-attachments/assets/b0076182-2b3b-4909-a97f-8c8a3706d40f" />
 
 
 
