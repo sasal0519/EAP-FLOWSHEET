@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  ⚙️ Industrial Flowsheet & EAP Maker Pro
+  ⚙️ Flowsheet & EAP 
   <br>
 </h1>
 
@@ -30,7 +30,6 @@
 
 <img width="1920" height="1080" alt="FLOWSHEET" src="https://github.com/user-attachments/assets/f159c1f7-40d8-4dbf-ba84-1d12dd32df87" />
 
-*Dica: Substitui o link acima pela tua captura de ecrã (screenshot) real da aplicação com os dois separadores visíveis!*
 
 ---
 
