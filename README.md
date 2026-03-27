@@ -63,8 +63,67 @@ O projeto utiliza uma abordagem **Top-Down** para calcular as hierarquias e **Bo
 
 ## 📁 Estrutura do Projeto
 
-```text
-eap-flowsheet/
-├── eap_flowsheet.py    # Arquivo principal contendo a lógica e interface
-├── requirements.txt    # Dependências do projeto (PyQt5)
-└── README.md           # Documentação principal
+
+  🏭 Flowsheet 
+<h4 align="center">Uma ferramenta desktop open-source para desenhar Diagramas de Fluxo de Processos (PFD) com renderização 100% vetorial.</h4>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.x-blue.svg?style=flat-square" alt="Python">
+  <img src="https://img.shields.io/badge/PyQt5-GUI-green.svg?style=flat-square" alt="PyQt5">
+  <img src="https://img.shields.io/badge/Engineering-Chemical-orange.svg?style=flat-square" alt="Chemical Engineering">
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square" alt="License MIT">
+</p>
+
+<p align="center">
+  <a href="#-sobre-o-projeto">Sobre</a> •
+  <a href="#-funcionalidades">Funcionalidades</a> •
+  <a href="#-biblioteca-de-equipamentos">Equipamentos</a> •
+  <a href="#-como-instalar-e-usar">Instalação e Uso</a> •
+  <a href="#-arquitetura">Arquitetura</a> •
+  <a href="#-contribuir">Contribuir</a>
+</p>
+
+![Screenshot da Aplicação](https://via.placeholder.com/1000x500.png?text=Coloque+Aqui+Uma+Captura+de+Ecr%C3%A3+do+Seu+Software)
+*Dica: Substitui o link acima por uma captura de ecrã (screenshot) real da tua aplicação a funcionar!*
+
+---
+
+## 📖 Sobre o Projeto
+
+O **PFD Flowsheet Maker Pro** é um simulador visual e criador de diagramas desenvolvido para a Engenharia Química e de Processos. Diferente de outras ferramentas, este software **não utiliza ficheiros de imagem externos (PNG, JPG)**. Cada equipamento é renderizado através de cálculos matemáticos puros (vetores) em tempo real, garantindo um executável ultraleve e um *zoom* infinito sem qualquer perda de resolução.
+
+## ✨ Funcionalidades
+
+* 🖱️ **Drag & Drop (Arrastar e Largar):** Paleta lateral de equipamentos em formato de grelha, totalmente retrátil para maximizar a área de trabalho.
+* 🔀 **Tubagem Ortogonal (Manhattan Routing):** O algoritmo de roteamento desenha tubos com quebras estritas de 90 graus, mantendo o aspeto técnico e organizado.
+* 🧲 **Conectores Magnéticos:** As tubagens calculam automaticamente as portas cardeais (Topo, Base, Esquerda, Direita) mais próximas de cada equipamento.
+* 🔍 **Navegação de Alta Performance:** Zoom com a roda do rato (`Ctrl + Scroll`) ou através da barra de ferramentas, mantendo a nitidez vetorial.
+* ⚙️ **Menu de Contexto Interativo:** Clica com o botão direito do rato sobre qualquer equipamento ou tubagem para redimensionar dinamicamente ou eliminar o elemento.
+* 🌙 **UI Industrial (Dark Mode):** Interface desenhada para reduzir o cansaço visual, com alto contraste para as linhas de processo.
+
+## 🏭 Biblioteca de Equipamentos
+
+O software inclui **26 símbolos normalizados** organizados na paleta:
+
+| Transferência de Calor | Movimentação de Fluidos | Separação & Operações | Reatores & Armazenamento |
+| :--- | :--- | :--- | :--- |
+| 🔹 Trocador de Calor<br>🔹 Permutador a Ar<br>🔹 Fornalha<br>🔹 Caldeira<br>🔹 Torre de Resfriamento | 🔹 Bomba Centrífuga<br>🔹 Compressor<br>🔹 Soprador<br>🔹 Turbina<br>🔹 Ejetor<br>🔹 Válvula | 🔹 Torre de Destilação<br>🔹 Coluna de Absorção<br>🔹 Separador Bifásico<br>🔹 Ciclone<br>🔹 Evaporador<br>🔹 Filtro / Filtro Prensa<br>🔹 Secador<br>🔹 Peneira | 🔹 Reator<br>🔹 Misturador<br>🔹 Moinho<br>🔹 Vaso<br>🔹 Tanque<br>🔹 Flare (Chaminé) |
+
+## 🚀 Como Instalar e Usar
+
+Para clonar e correr esta aplicação vais precisar do [Git](https://git-scm.com) e do [Python](https://www.python.org/downloads/) instalados no teu computador.
+
+No teu terminal (linha de comandos):
+
+```bash
+# Clona este repositório
+$ git clone [https://github.com/TEU-USUARIO/NOME-DO-REPOSITORIO.git](https://github.com/TEU-USUARIO/NOME-DO-REPOSITORIO.git)
+
+# Acede à pasta do projeto
+$ cd NOME-DO-REPOSITORIO
+
+# Instala as dependências necessárias (PyQt5)
+$ pip install PyQt5
+
+# Executa a aplicação
+$ python pfd_flowsheet.py
