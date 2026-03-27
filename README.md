@@ -1,4 +1,4 @@
-<h1 align="center">📊 EAP-Flowsheet Generator</h1>
+<h1 align="center">📊 EAP/h1>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.x-blue.svg" alt="Python Version">
