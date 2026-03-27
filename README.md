@@ -44,6 +44,9 @@ Este projeto foi criado com o intuito de compreender os fundamentos por trás da
 
 **Versão 2 (Nova Interface PyQt5)** <img width="1920" height="1042" alt="Demonstração PyQt5" src="https://github.com/user-attachments/assets/b0076182-2b3b-4909-a97f-8c8a3706d40f" />
 
+**Versão 3 (Interface PyQt5 melhorada novas figuras)** <img width="1920" height="1042" alt="Novas figuras PyQt5" 
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/f206306d-9bab-4a08-9a2d-1198d5b2ef57" />
+
 ## 🛠️ Como a Estrutura Funciona?
 
 O projeto utiliza uma abordagem **Top-Down** para calcular as hierarquias e **Bottom-Up** para garantir o espaçamento correto no *canvas*:
