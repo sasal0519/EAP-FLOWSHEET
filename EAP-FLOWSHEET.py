@@ -2,13 +2,13 @@ import sys
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QMessageBox, QGraphicsView, QGraphicsScene,
-    QGraphicsItem, QLineEdit, QLabel
+    QGraphicsItem, QLineEdit, QLabel, QMenu
 )
 from PyQt5.QtGui import (
     QFont, QFontMetrics, QPen, QBrush, QColor,
-    QPainter, QPalette, QCursor
+    QPainter, QPalette, QCursor, QPolygonF, QIcon, QPixmap
 )
-from PyQt5.QtCore import Qt, QRectF, QTimer, pyqtSignal, QObject
+from PyQt5.QtCore import Qt, QRectF, QTimer, pyqtSignal, QObject, QPointF
 
 C_BG_APP       = "#0D0D0D"
 C_BG_NODE      = "#1A0A0A"
@@ -35,12 +35,13 @@ class NodeSignals(QObject):
 
 class NodeItem(QGraphicsItem):
 
-    def __init__(self, node_id, wbs, text, is_root, signals, zoom):
+    def __init__(self, node_id, wbs, text, is_root, shape, signals, zoom):
         super().__init__()
         self.node_id  = node_id
         self.wbs      = wbs
         self.text     = text
         self.is_root  = is_root
+        self.shape    = shape
         self.signals  = signals
         self.zoom     = zoom
         self._hovered = False
@@ -57,7 +58,6 @@ class NodeItem(QGraphicsItem):
         self.setCursor(QCursor(Qt.PointingHandCursor))
 
     def _get_text_width(self, fm, text):
-        # Fallback seguro para compatibilidade com versões antigas e novas do PyQt5
         if hasattr(fm, 'horizontalAdvance'):
             return fm.horizontalAdvance(text)
         return fm.width(text)
@@ -65,14 +65,24 @@ class NodeItem(QGraphicsItem):
     def _calc_size(self):
         fm  = QFontMetrics(self._font_text)
         fmw = QFontMetrics(self._font_wbs)
-        sample = self.text if self.text.strip() else "Clique para nomear"
-        pad    = 40 * self.zoom
         
+        # TEXTO MAIS CURTO PARA NÃO FORÇAR CAIXA LARGA
+        sample = self.text if self.text.strip() else "Nomear"
+        
+        # PADDING LIGEIRAMENTE REDUZIDO
+        pad_x = 30 * self.zoom
+        pad_y = 18 * self.zoom
+        
+        if self.shape in ["ellipse", "diamond"]:
+            pad_x *= 1.6
+            pad_y *= 1.8
+
         text_w = self._get_text_width(fm, sample)
         wbs_w  = self._get_text_width(fmw, self.wbs)
         
-        self._w = max(150 * self.zoom, max(text_w, wbs_w) + pad)
-        self._h = max(60  * self.zoom, fm.height() + fmw.height() + 24 * self.zoom)
+        # TAMANHO MÍNIMO INICIAL REDUZIDO (De 150/60 para 100/40)
+        self._w = max(100 * self.zoom, max(text_w, wbs_w) + pad_x)
+        self._h = max(40  * self.zoom, fm.height() + fmw.height() + pad_y)
 
     def width(self):  return self._w
     def height(self): return self._h
@@ -96,9 +106,21 @@ class NodeItem(QGraphicsItem):
         border = C_BORDER_ROOT if self.is_root else (C_BORDER if not empty else C_BORDER_EMPTY)
         style  = Qt.SolidLine if not empty else Qt.DashLine
         painter.setPen(QPen(QColor(border), 2.0 if self.is_root else 1.5, style))
-        painter.drawRoundedRect(r, 7, 7)
 
-        if self.is_root and not empty:
+        if self.shape == "roundrect":
+            painter.drawRoundedRect(r, 7, 7)
+        elif self.shape == "ellipse":
+            painter.drawEllipse(r)
+        elif self.shape == "diamond":
+            poly = QPolygonF([
+                QPointF(self._w / 2, 0),
+                QPointF(self._w, self._h / 2),
+                QPointF(self._w / 2, self._h),
+                QPointF(0, self._h / 2)
+            ])
+            painter.drawPolygon(poly)
+
+        if self.is_root and not empty and self.shape == "roundrect":
             painter.setBrush(QBrush(QColor(C_BORDER_ROOT)))
             painter.setPen(Qt.NoPen)
             painter.drawRoundedRect(QRectF(0, 0, self._w, 4), 2, 2)
@@ -106,34 +128,29 @@ class NodeItem(QGraphicsItem):
         if empty:
             painter.setFont(self._font_ph)
             painter.setPen(QColor(C_BORDER if self._hovered else C_PLACEHOLDER))
-            painter.drawText(r, Qt.AlignCenter, "✎  Clique para nomear")
+            painter.drawText(r, Qt.AlignCenter, "✎ Nomear") # PLACEHOLDER MAIS CURTO
         else:
             fmw = QFontMetrics(self._font_wbs)
             painter.setFont(self._font_wbs)
             painter.setPen(QColor(C_TEXT_WBS))
-            painter.drawText(QRectF(10 * self.zoom, 6 * self.zoom,
-                                    self._w - 20 * self.zoom, fmw.height()),
-                             Qt.AlignLeft | Qt.AlignVCenter, self.wbs)
+            
+            offset_y = 6 * self.zoom
+            if self.shape in ["ellipse", "diamond"]: offset_y += 10 * self.zoom
+            
+            painter.drawText(QRectF(0, offset_y, self._w, fmw.height()), 
+                             Qt.AlignHCenter | Qt.AlignVCenter, self.wbs)
+                             
             painter.setFont(self._font_text)
             painter.setPen(QColor(C_TEXT_MAIN))
-            painter.drawText(QRectF(8 * self.zoom,
-                                    6 * self.zoom + fmw.height() + 2 * self.zoom,
-                                    self._w - 16 * self.zoom,
-                                    QFontMetrics(self._font_text).height()),
+            painter.drawText(QRectF(0, offset_y + fmw.height() + 2 * self.zoom, self._w, QFontMetrics(self._font_text).height()), 
                              Qt.AlignCenter, self.text)
 
         if self._hovered:
             painter.setFont(self._font_btn)
-            self._draw_btn(painter,
-                           QRectF(self._w / 2 - hbs, self._h - hbs, bs, bs),
-                           "+", C_BTN_ADD)
+            self._draw_btn(painter, QRectF(self._w / 2 - hbs, self._h - hbs, bs, bs), "+", C_BTN_ADD)
             if not self.is_root:
-                self._draw_btn(painter,
-                               QRectF(self._w - hbs, self._h / 2 - hbs, bs, bs),
-                               "+", C_BTN_SIB)
-                self._draw_btn(painter,
-                               QRectF(-hbs, self._h / 2 - hbs, bs, bs),
-                               "−", C_BTN_DEL)
+                self._draw_btn(painter, QRectF(self._w - hbs, self._h / 2 - hbs, bs, bs), "+", C_BTN_SIB)
+                self._draw_btn(painter, QRectF(-hbs, self._h / 2 - hbs, bs, bs), "−", C_BTN_DEL)
 
     def _draw_btn(self, painter, rect, label, color):
         painter.setBrush(QBrush(QColor(color)))
@@ -210,8 +227,11 @@ class FloatingEditor(QLineEdit):
         self._original = current_text
         self._done     = False
         tl = view.mapFromScene(scene_rect.topLeft())
-        w  = max(180, int(scene_rect.width()))
-        h  = 36
+        
+        # LARGURA E ALTURA DO EDITOR FLUTUANTE REDUZIDAS
+        w  = max(100, int(scene_rect.width()))
+        h  = 30 
+        
         self.setGeometry(tl.x(),
                          tl.y() + int(scene_rect.height() / 2) - h // 2,
                          w, h)
@@ -248,10 +268,11 @@ class EAPApp(QMainWindow):
         self.setWindowTitle("EAP-FLOWSHEET")
         self.setGeometry(100, 100, 1600, 900)
 
-        self.base_pad_x      = 40
-        self.base_pad_y      = 70
-        self.base_min_width  = 120
-        self.base_box_height = 60
+        # REDUZINDO LIGEIRAMENTE O ESPAÇAMENTO ENTRE NÓS PARA COMBINAR COM O NOVO TAMANHO
+        self.base_pad_x      = 35
+        self.base_pad_y      = 60
+        self.base_min_width  = 100
+        self.base_box_height = 40
         self.zoom            = 1.0
 
         self.next_id         = 2
@@ -260,7 +281,7 @@ class EAPApp(QMainWindow):
         self.node_positions  = {}
         self._scene_items    = []
 
-        self.nodes = {1: {"text": "", "children": [], "parent": None}}
+        self.nodes = {1: {"text": "", "children": [], "parent": None, "shape": "roundrect"}}
 
         self.signals = NodeSignals()
         self.signals.commit_text.connect(self._on_commit)
@@ -323,7 +344,6 @@ class EAPApp(QMainWindow):
         sep.setStyleSheet(f"background:{C_BORDER};")
         tb.addWidget(sep)
 
-        # CORREÇÃO: Usando *args no lambda para ignorar o boolean 'checked' enviado pelo clicked
         botoes = [
             ("🔍−", lambda *args: self.zoom_out()),
             ("🔍+", lambda *args: self.zoom_in()),
@@ -346,7 +366,6 @@ class EAPApp(QMainWindow):
         self.view.setStyleSheet("border:none;")
         layout.addWidget(self.view)
 
-    # CORREÇÃO: Permite aceitar *args caso algum evento do Qt tente passar parâmetros
     def zoom_in(self, *args):  self.update_zoom(self.zoom * 1.15)
     def zoom_out(self, *args): self.update_zoom(self.zoom / 1.15)
 
@@ -365,6 +384,60 @@ class EAPApp(QMainWindow):
         self.box_height = self.base_box_height * self.zoom
         self.draw_eap()
 
+    def _create_shape_icon(self, shape_type):
+        pixmap = QPixmap(32, 32)
+        pixmap.fill(Qt.transparent)
+        
+        painter = QPainter(pixmap)
+        painter.setRenderHint(QPainter.Antialiasing)
+        
+        painter.setPen(QPen(QColor(C_BORDER), 2))
+        painter.setBrush(QBrush(QColor(C_BG_NODE)))
+        
+        rect = QRectF(4, 4, 24, 24)
+        
+        if shape_type == "roundrect":
+            painter.drawRoundedRect(rect, 4, 4)
+        elif shape_type == "ellipse":
+            painter.drawEllipse(rect)
+        elif shape_type == "diamond":
+            poly = QPolygonF([
+                QPointF(16, 4),
+                QPointF(28, 16),
+                QPointF(16, 28),
+                QPointF(4, 16)
+            ])
+            painter.drawPolygon(poly)
+            
+        painter.end()
+        return QIcon(pixmap)
+
+    def _choose_shape(self):
+        menu = QMenu(self)
+        
+        menu.setStyleSheet(f"""
+            QMenu {{ background-color: {C_BG_NODE}; color: {C_TEXT_MAIN}; 
+                    border: 1px solid {C_BORDER}; font-family: 'Segoe UI'; font-size: 10pt; }}
+            QMenu::item {{ padding: 6px 24px 6px 36px; }} 
+            QMenu::item:selected {{ background-color: {C_BORDER}; color: #0D0D0D; }}
+            QMenu::icon {{ padding-left: 10px; }}
+        """)
+        
+        icon_rect    = self._create_shape_icon("roundrect")
+        icon_ellipse = self._create_shape_icon("ellipse")
+        icon_diamond = self._create_shape_icon("diamond")
+        
+        action_rect    = menu.addAction(icon_rect, "Retângulo Arredondado")
+        action_ellipse = menu.addAction(icon_ellipse, "Elipse (Círculo)")
+        action_diamond = menu.addAction(icon_diamond, "Losango (Decisão)")
+        
+        selected = menu.exec_(QCursor.pos())
+        
+        if selected == action_rect:    return "roundrect"
+        if selected == action_ellipse: return "ellipse"
+        if selected == action_diamond: return "diamond"
+        return None 
+
     def _on_commit(self, node_id, new_text):
         if node_id in self.nodes:
             self.nodes[node_id]["text"] = new_text
@@ -380,8 +453,11 @@ class EAPApp(QMainWindow):
                                 scene_r, self.view)
 
     def _on_add_child(self, parent_id):
+        shape = self._choose_shape()
+        if not shape: return 
+        
         new_id = self.next_id; self.next_id += 1
-        self.nodes[new_id] = {"text": "", "children": [], "parent": parent_id}
+        self.nodes[new_id] = {"text": "", "children": [], "parent": parent_id, "shape": shape}
         self.nodes[parent_id]["children"].append(new_id)
         self.draw_eap()
         QTimer.singleShot(60, lambda n=new_id: self._on_edit_start(n))
@@ -389,8 +465,12 @@ class EAPApp(QMainWindow):
     def _on_add_sibling(self, node_id):
         parent_id = self.nodes[node_id]["parent"]
         if parent_id is None: return
+        
+        shape = self._choose_shape()
+        if not shape: return
+        
         new_id = self.next_id; self.next_id += 1
-        self.nodes[new_id] = {"text": "", "children": [], "parent": parent_id}
+        self.nodes[new_id] = {"text": "", "children": [], "parent": parent_id, "shape": shape}
         self.nodes[parent_id]["children"].append(new_id)
         self.draw_eap()
         QTimer.singleShot(60, lambda n=new_id: self._on_edit_start(n))
@@ -420,9 +500,10 @@ class EAPApp(QMainWindow):
     def pre_calcular_dimensoes(self):
         self.node_dimensions.clear()
         for nid in self.nodes:
+            shape = self.nodes[nid].get("shape", "roundrect")
             tmp = NodeItem(nid, self.wbs_numbers.get(nid, ""),
                            self.nodes[nid]["text"], nid == 1,
-                           self.signals, self.zoom)
+                           shape, self.signals, self.zoom)
             self.node_dimensions[nid] = (tmp.width(), tmp.height())
 
     def calcular_posicoes(self, node_id, nivel):
@@ -487,9 +568,10 @@ class EAPApp(QMainWindow):
     def _draw_nodes(self):
         for nid, (x, y) in self.node_positions.items():
             nw, nh = self.node_dimensions[nid]
+            shape  = self.nodes[nid].get("shape", "roundrect")
             item = NodeItem(nid, self.wbs_numbers[nid],
                             self.nodes[nid]["text"],
-                            nid == 1, self.signals, self.zoom)
+                            nid == 1, shape, self.signals, self.zoom)
             item.setPos(x - nw / 2, y - nh / 2)
             self.scene.addItem(item)
             self._scene_items.append(item)
@@ -501,4 +583,3 @@ if __name__ == "__main__":
     w = EAPApp()
     w.show()
     sys.exit(app.exec_())
-    #versão com bug corrigido e melhorias na interface, incluindo suporte a zoom e uma barra de ferramentas para controle rápido. O código foi refatorado para melhor organização e legibilidade, mantendo a funcionalidade principal de criação e edição de fluxogramas de forma intuitiva.
